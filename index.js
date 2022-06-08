@@ -171,3 +171,21 @@ function promptDelete(deleteCommand) {
       });
     });
 }
+
+function dataCommand() {
+  var database = `SELECT a.id, a.first_name, a.last_name, b.title, c.name AS department, b.salary, 
+    CONCAT(j.first_name, ' ', j.last_name) AS manager FROM employee a
+    JOIN role b ON a.role_id = b.id
+    JOIN department c ON c.id = b.department_id
+    JOIN employee j ON j.id = j.manager_id`;
+
+  connection.query(database, (err, res) => {
+    var selectResponse = res.map(({ id, first_name, last_name }) => ({
+      value: id,
+      name: `${first_name} ${last_name}`,
+    }));
+
+    console.table(res);
+    roleArray(selectResponse);
+  });
+}
