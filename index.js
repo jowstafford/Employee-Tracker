@@ -57,3 +57,21 @@ function inputResult() {
       }
     });
 }
+
+function updateCommand() {
+  dataCommand();
+}
+
+function viewCommand() {
+  var database = `SELECT a.id, a.first_name, a.last_name, b.title, c.name 
+    AS department, b.salary, CONCAT(j.first_name, ' ', j.last_name) 
+    AS manager FROM employee a
+    LEFT JOIN role b ON a.role_id = b.id
+    LEFT JOIN department c ON c.id = b.department_id
+    LEFT JOIN employee j ON j.id = a.manager_id`;
+
+  connection.query(database, function (err, res) {
+    console.table(res);
+    inputResult();
+  });
+}
