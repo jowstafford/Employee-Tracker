@@ -205,3 +205,20 @@ function roleArray(selectResponse) {
     employeeInput(selectResponse, roleOutput);
   });
 }
+
+function addCommand() {
+  var database = `SELECT c.id, b.name, c.salary AS budget FROM employee a
+      JOIN role c ON a.role_id = c.id
+      JOIN department b ON b.id = c.department_id
+      GROUP BY c.id, b.name`;
+
+  connection.query(database, function (err, res) {
+    var departmentResponse = res.map(({ id, name }) => ({
+      value: id,
+      name: `${id} ${name}`,
+    }));
+
+    console.table(res);
+    promptAddRole(departmentResponse);
+  });
+}
