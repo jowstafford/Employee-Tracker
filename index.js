@@ -179,7 +179,7 @@ function dataCommand() {
     JOIN department c ON c.id = b.department_id
     JOIN employee j ON j.id = j.manager_id`;
 
-  connection.query(database, (err, res) => {
+  connection.query(database, (res) => {
     var selectResponse = res.map(({ id, first_name, last_name }) => ({
       value: id,
       name: `${first_name} ${last_name}`,
@@ -187,5 +187,21 @@ function dataCommand() {
 
     console.table(res);
     roleArray(selectResponse);
+  });
+}
+
+function roleArray(selectResponse) {
+  var database = `SELECT b.id, b.title, b.salary FROM role b`;
+  var roleOutput;
+
+  connection.query(database, function (err, res) {
+    roleOutput = res.map(({ id, title, salary }) => ({
+      value: id,
+      title: `${title}`,
+      salary: `${salary}`,
+    }));
+
+    console.table(res);
+    employeeInput(selectResponse, roleOutput);
   });
 }
