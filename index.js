@@ -70,7 +70,7 @@ function viewCommand() {
     LEFT JOIN department c ON c.id = b.department_id
     LEFT JOIN employee j ON j.id = a.manager_id`;
 
-  connection.query(database, function (err, res) {
+  connection.query(database, function (res) {
     console.table(res);
     inputResult();
   });
@@ -81,7 +81,7 @@ function addCommand() {
       SELECT b.id, b.title, b.salary 
       FROM role b`;
 
-  connection.query(database, function (err, res) {
+  connection.query(database, function (res) {
     var roleOutput = res.map(({ id, title, salary }) => ({
       value: id,
       title: `${title}`,
@@ -129,10 +129,45 @@ function promptInsert(roleOutput) {
           manager_id: result.managerId,
         },
 
-        function (err, res) {
+        function (res) {
           console.table(res);
           inputResult();
         }
       );
+    });
+}
+
+function removeCommand() {
+  var database = `SELECT a.id, a.first_name, a.last_name FROM employee a`;
+
+  connection.query(database, function (err, res) {
+    var deleteCommand = res.map(({ id, first_name, last_name }) => ({
+      value: id,
+      name: `${id} ${first_name} ${last_name}`,
+    }));
+
+    console.table(res);
+    promptDelete(deleteCommand);
+  });
+}
+
+function promptDelete(deleteCommand) {
+  inquirer
+
+    .prompt([
+      {
+        type: "list",
+        name: "employeeid",
+        message: "choose employee",
+        choices: deleteCommand,
+      },
+    ])
+
+    .then(function (result) {
+      var database = `DELETE FROM employee WHERE?`;
+      connection.query(database, { id: result.employeeid }, (err, res) => {
+        console.table(res);
+        inputResult();
+      });
     });
 }
