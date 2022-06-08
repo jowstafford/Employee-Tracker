@@ -222,3 +222,46 @@ function addCommand() {
     promptAddRole(departmentResponse);
   });
 }
+
+function promptAddRole(departmentResponse) {
+  inquirer
+
+    .prompt([
+      {
+        type: "input",
+        name: "title",
+        message: "add title:",
+      },
+
+      {
+        type: "input",
+        name: "salary",
+        message: "add salary:",
+      },
+
+      {
+        type: "list",
+        name: "departmentIdentification",
+        message: "find department:",
+        choices: departmentResponse,
+      },
+    ])
+
+    .then(function (result) {
+      var database = `INSERT INTO role SET ?`;
+      connection.query(
+        database,
+
+        {
+          title: result.title,
+          salary: result.salary,
+          department_id: result.departmentIdentification,
+        },
+
+        function (err, res) {
+          console.table(res);
+          inputResult();
+        }
+      );
+    });
+}
