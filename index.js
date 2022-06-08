@@ -92,3 +92,47 @@ function addCommand() {
     promptInsert(roleOutput);
   });
 }
+function promptInsert(roleOutput) {
+  inquirer
+
+    .prompt([
+      {
+        type: "input",
+        name: "first_name",
+        message: "Please Enter First Name",
+      },
+
+      {
+        type: "input",
+        name: "last_name",
+        message: "Please Enter Last Name",
+      },
+
+      {
+        type: "list",
+        name: "roleid",
+        message: "Select Employee Role",
+        choices: roleOutput,
+      },
+    ])
+
+    .then(function (result) {
+      console.log(result);
+      var database = `INSERT INTO employee SET?`;
+
+      connection.query(
+        database,
+        {
+          first_name: result.first_name,
+          last_name: result.last_name,
+          role_id: result.roleid,
+          manager_id: result.managerId,
+        },
+
+        function (err, res) {
+          console.table(res);
+          inputResult();
+        }
+      );
+    });
+}
