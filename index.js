@@ -1,4 +1,5 @@
 var mysql = require("mysql");
+var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -8,7 +9,7 @@ var connection = mysql.createConnection({
   database: "employeesdb",
 });
 
-connection.connect(function () {
+connection.connect(function (err) {
   inputResult();
 });
 
@@ -64,13 +65,13 @@ function updateCommand() {
 
 function viewCommand() {
   var database = `SELECT a.id, a.first_name, a.last_name, b.title, c.name 
-    AS department, b.salary, CONCAT(j.first_name, ' ', j.last_name) 
-    AS manager FROM employee a
-    LEFT JOIN role b ON a.role_id = b.id
-    LEFT JOIN department c ON c.id = b.department_id
-    LEFT JOIN employee j ON j.id = a.manager_id`;
+  AS department, b.salary, CONCAT(j.first_name, ' ', j.last_name) 
+  AS manager FROM employee a
+  LEFT JOIN role b ON a.role_id = b.id
+  LEFT JOIN department c ON c.id = b.department_id
+  LEFT JOIN employee j ON j.id = a.manager_id`;
 
-  connection.query(database, function (res) {
+  connection.query(database, function (err, res) {
     console.table(res);
     inputResult();
   });
@@ -78,10 +79,10 @@ function viewCommand() {
 
 function addCommand() {
   var database = `
-      SELECT b.id, b.title, b.salary 
-      FROM role b`;
+    SELECT b.id, b.title, b.salary 
+    FROM role b`;
 
-  connection.query(database, function (res) {
+  connection.query(database, function (err, res) {
     var roleOutput = res.map(({ id, title, salary }) => ({
       value: id,
       title: `${title}`,
@@ -92,6 +93,7 @@ function addCommand() {
     promptInsert(roleOutput);
   });
 }
+
 function promptInsert(roleOutput) {
   inquirer
 
@@ -129,7 +131,7 @@ function promptInsert(roleOutput) {
           manager_id: result.managerId,
         },
 
-        function (res) {
+        function (err, res) {
           console.table(res);
           inputResult();
         }
@@ -174,12 +176,12 @@ function promptDelete(deleteCommand) {
 
 function dataCommand() {
   var database = `SELECT a.id, a.first_name, a.last_name, b.title, c.name AS department, b.salary, 
-    CONCAT(j.first_name, ' ', j.last_name) AS manager FROM employee a
-    JOIN role b ON a.role_id = b.id
-    JOIN department c ON c.id = b.department_id
-    JOIN employee j ON j.id = j.manager_id`;
+  CONCAT(j.first_name, ' ', j.last_name) AS manager FROM employee a
+  JOIN role b ON a.role_id = b.id
+  JOIN department c ON c.id = b.department_id
+  JOIN employee j ON j.id = j.manager_id`;
 
-  connection.query(database, (res) => {
+  connection.query(database, (err, res) => {
     var selectResponse = res.map(({ id, first_name, last_name }) => ({
       value: id,
       name: `${first_name} ${last_name}`,
@@ -208,9 +210,9 @@ function roleArray(selectResponse) {
 
 function addCommand() {
   var database = `SELECT c.id, b.name, c.salary AS budget FROM employee a
-      JOIN role c ON a.role_id = c.id
-      JOIN department b ON b.id = c.department_id
-      GROUP BY c.id, b.name`;
+    JOIN role c ON a.role_id = c.id
+    JOIN department b ON b.id = c.department_id
+    GROUP BY c.id, b.name`;
 
   connection.query(database, function (err, res) {
     var departmentResponse = res.map(({ id, name }) => ({
