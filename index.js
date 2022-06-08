@@ -265,3 +265,36 @@ function promptAddRole(departmentResponse) {
       );
     });
 }
+
+function employeeInput(selectResponse, roleOutput) {
+  inquirer
+
+    .prompt([
+      {
+        type: "list",
+        name: "employeeid",
+        message: "select employee",
+        choices: selectResponse,
+      },
+
+      {
+        type: "list",
+        name: "roleid",
+        message: "select role",
+        choices: roleOutput,
+      },
+    ])
+
+    .then(function (result) {
+      var database = `UPDATE employee SET role_id = ? WHERE id = ?`;
+      connection.query(
+        database,
+        [result.roleid, result.employeeid],
+
+        function (err, res) {
+          console.table(res);
+          inputResult();
+        }
+      );
+    });
+}
