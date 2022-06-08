@@ -75,3 +75,20 @@ function viewCommand() {
     inputResult();
   });
 }
+
+function addCommand() {
+  var database = `
+      SELECT b.id, b.title, b.salary 
+      FROM role b`;
+
+  connection.query(database, function (err, res) {
+    var roleOutput = res.map(({ id, title, salary }) => ({
+      value: id,
+      title: `${title}`,
+      salary: `${salary}`,
+    }));
+
+    console.table(res);
+    promptInsert(roleOutput);
+  });
+}
